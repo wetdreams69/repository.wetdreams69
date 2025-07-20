@@ -1,4 +1,3 @@
-# .github/workflows/build.yml
 name: Build Kodi Repo
 
 on:
@@ -48,13 +47,9 @@ jobs:
         run: |
           cp zips/*.zip repo/
 
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
-          git add ${REPO_NAME}.zip
-          git diff --cached --quiet && echo "No changes to commit" && exit 0
-
-          git commit -m "Update zip file on push"
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-          git push origin HEAD:master
-          
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./repo
+          publish_branch: gh-pages
