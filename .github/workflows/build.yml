@@ -47,3 +47,6 @@ jobs:
       - name: Copy zips to repo
         run: |
           cp zips/*.zip repo/
+          git add .
+          git commit -m "build repo"
+          git push
