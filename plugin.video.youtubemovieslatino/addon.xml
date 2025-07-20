@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.youtubemovieslatino"
+       name="YouTube Movies Latino"
+       version="1.0.0"
+       provider-name="wetdreams69">
+
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.requests" version="2.18.4"/>
+        <import addon="plugin.video.youtube" version="7.0.1"/>
+    </requires>
+
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+    </extension>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="es">Muestra películas de YouTube</summary>
+        <description lang="es">Este addon lista películas de YouTube.</description>
+        <platform>all</platform>
+        <icon>icon.png</icon>
+        <license>MIT</license>
+        <language>es</language>
+        <website>https://github.com/wetdreams69/plugin.video.youtubemovieslatino</website>
+    </extension>
+
+</addon>
+
