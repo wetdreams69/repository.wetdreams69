@@ -38,8 +38,9 @@ jobs:
       - name: Generate addons.xml and md5
         run: |
           echo "<addons>" > repo/addons.xml
-          find repo -name addon.xml | while read addon; do
-            cat "$addon" | tr -d '\n' >> repo/addons.xml
+          find repo -name addon.xml | sort | while read addon; do
+            cat "$addon" >> repo/addons.xml
+            echo "" >> repo/addons.xml
           done
           echo "</addons>" >> repo/addons.xml
           md5sum repo/addons.xml | cut -d ' ' -f1 > repo/addons.xml.md5
