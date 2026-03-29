@@ -14,8 +14,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Install unzip
-        run: sudo apt-get install unzip
+      - name: Install dependencies
+        run: |
+          apt-get update -qq && apt-get install -y -qq curl unzip > /dev/null 2>&1 || true
 
       - name: Create folders
         run: |
@@ -24,9 +25,9 @@ jobs:
 
       - name: Download addon zips
         run: |
-          wget -O zips/plugin.video.mercadoplay.zip https://github.com/wetdreams69/plugin.video.mercadoplay/raw/master/plugin.video.mercadoplay.zip
-          wget -O zips/plugin.video.youtubemovieslatino.zip https://github.com/wetdreams69/plugin.video.youtubemovieslatino/raw/main/plugin.video.youtubemovieslatino.zip
-          wget -O zips/plugin.video.robinhood.zip https://github.com/wetdreams69/plugin.video.robinhood/raw/master/plugin.video.robinhood.zip
+          curl -L -o zips/plugin.video.mercadoplay.zip https://github.com/wetdreams69/plugin.video.mercadoplay/raw/master/plugin.video.mercadoplay.zip
+          curl -L -o zips/plugin.video.youtubemovieslatino.zip https://github.com/wetdreams69/plugin.video.youtubemovieslatino/raw/main/plugin.video.youtubemovieslatino.zip
+          curl -L -o zips/plugin.video.pluto_vod.zip https://github.com/wetdreams69/plugin.video.pluto_vod/raw/master/plugin.video.pluto_vod.zip
 
       - name: Unzip addons and extract addon.xml
         run: |
