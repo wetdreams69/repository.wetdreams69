@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Actualizado a v4 para arreglar advertencia de Node.js
 
       - name: Install dependencies
         run: |
@@ -75,6 +75,10 @@ jobs:
               fi
             fi
           done
+          
+          # Copiar el zip del repositorio a la raíz para compatibilidad de Kodi "Add Source"
+          cp "repo/repository.wetdreams69/repository.wetdreams69-1.0.0.zip" "repo/repository.wetdreams69-1.0.0.zip"
+          
           echo "=== Repository contents ==="
           ls -lah repo/
 
@@ -90,7 +94,7 @@ jobs:
         run: echo "date=$(date +'%Y%m%d_%H%M%S')" >> $GITHUB_OUTPUT
 
       - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v4 
+        uses: peaceiris/actions-gh-pages@v4 # Excelente idea de push a gh-pages
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./repo
@@ -98,7 +102,7 @@ jobs:
           keep_files: true
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2 
+        uses: softprops/action-gh-release@v2 # Actualizado a v2 para advertencia de Node.js
         with:
           files: |
             repository.zip
