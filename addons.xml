@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.mercadoplay"
        name="MercadoLibre Play"
        version="1.0.1"
@@ -28,7 +28,6 @@
     </extension>
 </addon>
 
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.pluto_vod" name="Pluto VOD" version="0.0.3">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
@@ -39,7 +38,6 @@
     </extension>
 </addon>
 
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.youtubemovieslatino"
        name="YouTube Movies Latino"
        version="1.0.0"
@@ -69,5 +67,20 @@
 
 </addon>
 
+
+<addon id="repository.wetdreams69" name="wetdreams69 Repository" version="1.0.0" provider-name="wetdreams69">
+    <extension point="xbmc.addon.repository" name="wetdreams69 Repository">
+        <dir>
+            <info compressed="false">https://raw.githubusercontent.com/wetdreams69/repository.wetdreams69/master/repo/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/wetdreams69/repository.wetdreams69/master/repo/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/wetdreams69/repository.wetdreams69/master/repo/</datadir>
+        </dir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>wetdreams69 Repository</summary>
+        <description>Repositorio de addons de wetdreams69 (MercadoPlay, Pluto VOD, Youtube Latino)</description>
+        <platform>all</platform>
+    </extension>
+</addon>
 
 </addons>
