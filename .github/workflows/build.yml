@@ -52,12 +52,11 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          cd repo
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          git add addons.xml addons.xml.md5 *.zip
+          git add repo/addons.xml repo/addons.xml.md5 repo/*.zip
           git commit -m "Build: update addons and metadata" || true
-          git push
+          git push origin master
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
