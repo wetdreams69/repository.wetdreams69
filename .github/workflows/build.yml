@@ -49,6 +49,9 @@ jobs:
       - name: Copy zips to repo
         run: |
           cp zips/*.zip repo/
+          # List repo contents for debugging
+          echo "=== Repository contents ==="
+          ls -lah repo/
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
@@ -56,3 +59,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./repo
           publish_branch: gh-pages
+          keep_files: true
