@@ -1,0 +1,111 @@
+import uuid
+import urllib.parse
+import xbmc
+import xbmcgui
+import xbmcplugin
+import threading
+
+from api import get_token, HEADERS_BASE, http_get
+from manifest import get_periods_from_manifest, filter_ad_periods
+from ad_skipper import AdSkipper
+from constants import (
+    URL_EPISODES,
+    URL_STREAM_STITCHER,
+    URL_DRM_LICENSE,
+    AUTH_PARAMS,
+    DEVICE_PARAMS,
+    AD_MIN_DURATION,
+    AD_MAX_DURATION,
+    IST_HEADERS,
+    MIME_TYPE_DASH,
+    INPUTSTREAM_NAME,
+    DRM_LICENSE_TYPE,
+    LOG_PREFIX_PLUTO,
+    LOG_PREFIX_AD_SKIP,
+)
+
+
+def play(addon_handle, content_id, ad_skipper_data):
+    token = get_token()
+    headers = HEADERS_BASE.copy()
+    headers["Authorization"] = f"Bearer {token}"
+    try:
+        xbmc.log(f"{LOG_PREFIX_PLUTO} Getting episode: {content_id}", xbmc.LOGINFO)
+        data = http_get(
+            URL_EPISODES.format(content_id=content_id),
+            headers,
+            DEVICE_PARAMS,
+        )
+        stitched = data.get("stitched", {})
+        paths = stitched.get("paths", [])
+        dash_path = None
+        for p in paths:
+            if p.get("type") == "mpd":
+                dash_path = p.get("path")
+                break
+        if not dash_path:
+            raise ValueError("No DASH stream found")
+        client_id = str(uuid.uuid4())
+        session_id = str(uuid.uuid4())
+        params = AUTH_PARAMS.copy()
+        params.update({
+            "advertisingId": "",
+            "clientID": client_id,
+            "deviceId": client_id,
+            "sessionID": session_id,
+            "sid": session_id,
+            "userId": "",
+            "jwt": token,
+            "masterJWTPassthrough": "true",
+            "includeExtendedEvents": "true",
+        })
+        base = URL_STREAM_STITCHER
+        stream = f"{base}/v2{dash_path}?{urllib.parse.urlencode(params)}"
+        xbmc.log(f"{LOG_PREFIX_PLUTO} Stream URL built", xbmc.LOGINFO)
+        periods = get_periods_from_manifest(stream)
+        ad_periods = filter_ad_periods(periods, AD_MIN_DURATION, AD_MAX_DURATION)
+        if ad_periods:
+            xbmc.log(
+                f"{LOG_PREFIX_PLUTO} Found {len(ad_periods)} ad periods ({AD_MIN_DURATION}-{AD_MAX_DURATION}s)",
+                xbmc.LOGINFO
+            )
+            dialog = xbmcgui.Dialog()
+            dialog.notification(
+                "Pluto TV",
+                f"{len(ad_periods)} ads detected - auto-skip",
+                xbmcgui.NOTIFICATION_INFO,
+                3000
+            )
+            skipper = AdSkipper(ad_periods)
+            skipper_thread = threading.Thread(target=skipper.start_monitoring)
+            skipper_thread.daemon = True
+            skipper_thread.start()
+            ad_skipper_data['skipper'] = skipper
+            ad_skipper_data['thread'] = skipper_thread
+            xbmc.log(
+                f"{LOG_PREFIX_AD_SKIP} Started - will skip short ads ({AD_MIN_DURATION}-{AD_MAX_DURATION}s)",
+                xbmc.LOGINFO
+            )
+        else:
+            xbmc.log(f"{LOG_PREFIX_PLUTO} No short ads found in manifest", xbmc.LOGINFO)
+        li = xbmcgui.ListItem(path=stream)
+        li.setMimeType(MIME_TYPE_DASH)
+        li.setProperty("inputstream", INPUTSTREAM_NAME)
+        li.setProperty("inputstream.adaptive.manifest_headers", IST_HEADERS)
+        li.setProperty("inputstream.adaptive.stream_headers", IST_HEADERS)
+        li.setProperty("inputstream.adaptive.license_type", DRM_LICENSE_TYPE)
+        li.setProperty(
+            "inputstream.adaptive.license_key",
+            f"{URL_DRM_LICENSE.format(token=token)}"
+            f"|User-Agent=Mozilla/5.0&Content-Type=application/octet-stream"
+            f"|R{{SSM}}|",
+        )
+        li.setProperty("IsPlayable", "true")
+        xbmcplugin.setResolvedUrl(addon_handle, True, li)
+    except Exception as e:
+        xbmc.log(f"{LOG_PREFIX_PLUTO} play failed: {e}", xbmc.LOGERROR)
+        import traceback
+        xbmc.log(f"{LOG_PREFIX_PLUTO} Traceback: {traceback.format_exc()}", xbmc.LOGERROR)
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Error", f"Could not play content: {str(e)}")
+        xbmcplugin.setResolvedUrl(addon_handle, False, xbmcgui.ListItem())

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <category label="config">
+        <setting id="adult_content" 
+                 type="bool"
+                 label="32002"
+                 default="false"/>
+        <setting id="clear_cache_action"
+                type="action"
+                label="32003"
+                action="RunPlugin(plugin://plugin.video.mercadoplay/?action=clear_cache)"
+                option="button"/>
+        <setting id="country" 
+                type="select" 
+                label="32004"
+                lvalues="32005|32006"/>
+    </category>
+</settings>

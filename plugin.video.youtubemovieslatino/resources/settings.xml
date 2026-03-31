@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <category label="Config">
+        <setting 
+            id="channel_ids" 
+            type="text"
+            default="UCfoYNzXYn6pNEkM2FweV7rw,UC59kv26xN0iBAFRAu_frvVg,UCLRuGl3bcIjOW7c-XswPBwQ,UCyIjaAaswXnBgyy8-CR6I0A,UC2oTkl31kSjt_zh7Ko-cc8Q,UCPtxgfDwFQRbRtyY4xu7Iaw,UCZhl1LxOZnemuwmLpo8hkaw,UCIHYWjFYN9UJiYDABxmCoVg"
+        />
+    </category>
+</settings>
