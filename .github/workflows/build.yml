@@ -10,21 +10,22 @@ jobs:
   build:
     name: Build and publish Kodi repository
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4 # Actualizado a v4 para arreglar advertencia de Node.js
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
-          apt-get update -qq && apt-get install -y -qq curl unzip zip > /dev/null 2>&1 || true
+          sudo apt-get update -qq && sudo apt-get install -y -qq curl unzip zip > /dev/null 2>&1 || true
 
       - name: Create folders
         run: |
           mkdir -p repo
           mkdir -p zips
-
-
 
       - name: Package repository addon
         run: |
@@ -36,7 +37,7 @@ jobs:
           curl -L -o zips/plugin.video.youtubemovieslatino.zip https://github.com/wetdreams69/plugin.video.youtubemovieslatino/raw/main/plugin.video.youtubemovieslatino.zip
           curl -L -o zips/plugin.video.pluto_vod.zip https://github.com/wetdreams69/plugin.video.pluto_vod/raw/master/plugin.video.pluto_vod.zip
 
-      - name: Unzip addons and extract addon.xml
+      - name: Unzip addons and build structure
         run: |
           for zip in zips/*.zip; do
             unzip -q -o "$zip" -d repo/
@@ -47,7 +48,8 @@ jobs:
           echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > repo/addons.xml
           echo "<addons>" >> repo/addons.xml
           find repo -name addon.xml | sort | while read addon; do
-            grep -v "<?xml" "$addon" >> repo/addons.xml
+            # Extract content minus the first line (<?xml...)
+            sed '1d' "$addon" >> repo/addons.xml
             echo "" >> repo/addons.xml
           done
           echo "</addons>" >> repo/addons.xml
@@ -71,51 +73,33 @@ jobs:
             fi
           done
           
-          # Copiar el zip del repositorio a la raíz para compatibilidad de Kodi "Add Source"
-          cp "repo/repository.wetdreams69/repository.wetdreams69-1.0.0.zip" "repo/repository.wetdreams69-1.0.0.zip"
+          # Repositorio ZIP para el RELEASE
+          cp "repo/repository.wetdreams69/repository.wetdreams69-1.0.0.zip" "repository.zip"
           
           echo "=== Repository contents ==="
-          ls -lah repo/
-
-      - name: Create repository ZIP (for GitHub Release)
-        run: |
-          cd repo
-          zip -qr ../repository.zip .
-          cd ..
-          echo "=== Repository ZIP created ==="
-
-      - name: Get current date
-        id: date
-        run: echo "date=$(date +'%Y%m%d_%H%M%S')" >> $GITHUB_OUTPUT
+          ls -R repo/
 
       - name: Generate Directory Index (Github Pages Apache mimic)
         run: |
           python3 generate_index.py repo
 
       - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v4 # Excelente idea de push a gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./repo
           publish_branch: gh-pages
-          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2 # Actualizado a v2 para advertencia de Node.js
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             repository.zip
             zips/repository.wetdreams69.zip
-          tag_name: repo-${{ steps.date.outputs.date }}
+          tag_name: repo-${{ github.sha }}
           body: |
-            Kodi Repository Build
-            
-            **Cómo instalar en Kodi:**
-            1. Descarga el archivo `repository.wetdreams69.zip` de los *Assets* a continuación.
-            2. Abre Kodi -> Ve a Add-ons (Complementos) -> Install from zip file (Instalar desde un archivo zip).
-            3. Selecciona `repository.wetdreams69.zip` para instalar el repositorio en el sistema.
-            
-            **Addons incluidos:**
-            - plugin.video.mercadoplay
-            - plugin.video.pluto_vod
-            - plugin.video.youtubemovieslatino
+            Kodi Repository Update
+            - Add repository source to Kodi: `https://wetdreams69.github.io/repository.wetdreams69/`
+            - Included addons: MercadoPlay, Pluto VOD, Youtube Latino
