@@ -24,6 +24,13 @@ jobs:
           mkdir -p repo
           mkdir -p zips
 
+      - name: Copy index.html
+        run: |
+          cp repo/index.html . || true
+          rm -rf repo
+          mkdir -p repo
+          [ -f index.html ] && cp index.html repo/index.html
+
       - name: Download addon zips
         run: |
           curl -L -o zips/plugin.video.mercadoplay.zip https://github.com/wetdreams69/plugin.video.mercadoplay/raw/master/plugin.video.mercadoplay.zip
