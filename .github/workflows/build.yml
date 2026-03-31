@@ -17,7 +17,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt-get update -qq && apt-get install -y -qq curl unzip > /dev/null 2>&1 || true
+          apt-get update -qq && apt-get install -y -qq curl unzip zip > /dev/null 2>&1 || true
 
       - name: Create folders
         run: |
@@ -30,6 +30,10 @@ jobs:
           rm -rf repo
           mkdir -p repo
           [ -f index.html ] && cp index.html repo/index.html
+
+      - name: Package repository addon
+        run: |
+          zip -r zips/repository.wetdreams69.zip repository.wetdreams69
 
       - name: Download addon zips
         run: |
@@ -45,25 +49,68 @@ jobs:
 
       - name: Generate addons.xml and md5
         run: |
-          echo "<addons>" > repo/addons.xml
+          echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > repo/addons.xml
+          echo "<addons>" >> repo/addons.xml
           find repo -name addon.xml | sort | while read addon; do
-            cat "$addon" >> repo/addons.xml
+            # Extract content of each addon.xml, skipping the xml declaration
+            grep -v "<?xml" "$addon" >> repo/addons.xml
             echo "" >> repo/addons.xml
           done
           echo "</addons>" >> repo/addons.xml
           md5sum repo/addons.xml | cut -d ' ' -f1 > repo/addons.xml.md5
 
-      - name: Copy zips to repo
+      - name: Organize zip files according to Kodi specifications
         run: |
-          cp zips/*.zip repo/
-          # List repo contents for debugging
+          for addon_xml in repo/*/addon.xml; do
+            addon_dir=$(dirname "$addon_xml")
+            addon_id=$(basename "$addon_dir")
+            addon_version=$(grep -oP '<addon[^>]+version="\K[^"]+' "$addon_xml" | head -1)
+            
+            if [ -n "$addon_id" ] && [ -n "$addon_version" ]; then
+              if [ -f "zips/$addon_id.zip" ]; then
+                cp "zips/$addon_id.zip" "repo/$addon_id/${addon_id}-${addon_version}.zip"
+              else
+                cd repo
+                zip -qr "$addon_id/${addon_id}-${addon_version}.zip" "$addon_id"
+                cd ..
+              fi
+            fi
+          done
           echo "=== Repository contents ==="
           ls -lah repo/
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Create repository ZIP
+        run: |
+          cd repo
+          zip -r ../repository.zip .
+          cd ..
+          echo "=== Repository ZIP created ==="
+          ls -lah repository.zip
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y%m%d_%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./repo
-          publish_branch: gh-pages
-          keep_files: true
+          files: |
+            repository.zip
+            zips/repository.wetdreams69.zip
+          tag_name: repo-${{ steps.date.outputs.date }}
+          body: |
+            Kodi Repository Build
+            
+            **Cómo instalar en Kodi:**
+            1. Descarga el archivo `repository.wetdreams69.zip` de los *Assets* a continuación.
+            2. Abre Kodi -> Ve a Add-ons (Complementos) -> Install from zip file (Instalar desde un archivo zip).
+            3. Selecciona `repository.wetdreams69.zip` para instalar el repositorio en el sistema.
+            
+            *(Alternativamente, puedes descomprimir `repository.zip` de forma manual en tu carpeta de Add-ons si sabes lo que haces).*
+            
+            **Addons incluidos:**
+            - plugin.video.mercadoplay
+            - plugin.video.pluto_vod
+            - plugin.video.youtubemovieslatino
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
