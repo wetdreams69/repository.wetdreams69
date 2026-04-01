@@ -59,8 +59,8 @@ jobs:
         run: |
           for addon_xml in repo/*/addon.xml; do
             addon_dir=$(dirname "$addon_xml")
-            addon_id=$(basename "$addon_dir")
-            addon_version=$(grep -oP '<addon[^>]+version="\K[^"]+' "$addon_xml" | head -1)
+            addon_id=$(python3 -c "import xml.etree.ElementTree as ET; print(ET.parse('$addon_xml').getroot().attrib['id'])")
+            addon_version=$(python3 -c "import xml.etree.ElementTree as ET; print(ET.parse('$addon_xml').getroot().attrib['version'])")
             
             if [ -n "$addon_id" ] && [ -n "$addon_version" ]; then
               if [ -f "zips/$addon_id.zip" ]; then
