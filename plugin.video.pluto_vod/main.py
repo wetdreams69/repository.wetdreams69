@@ -21,18 +21,7 @@ def router():
         if not query:
             return
 
-        results = search(query)
-
-        for r in results:
-            name = r.get("name")
-            cid = r.get("id")
-
-            li = xbmcgui.ListItem(label=name)
-            url = f"{sys.argv[0]}?action=series&id={cid}"
-
-            xbmcplugin.addDirectoryItem(addon_handle, url, li, True)
-
-        xbmcplugin.endOfDirectory(addon_handle)
+        search(addon_handle, query)
 
     elif action == "categories":
         list_categories(addon_handle)
@@ -50,10 +39,12 @@ def router():
         play(addon_handle, params["id"], ad_skipper_data)
 
     else:
+        # Mostrar opción de búsqueda
         li = xbmcgui.ListItem(label="Buscar")
         url = f"{sys.argv[0]}?action=search"
         xbmcplugin.addDirectoryItem(addon_handle, url, li, True)
 
+        # Mostrar todas las categorías directamente
         list_categories(addon_handle, show_end_directory=False)
         
         xbmcplugin.endOfDirectory(addon_handle)

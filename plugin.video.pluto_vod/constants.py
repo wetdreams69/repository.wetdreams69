@@ -2,21 +2,21 @@ URL_AUTH_START = "https://boot.pluto.tv/v4/start"
 URL_SEARCH = "https://service-media-search.clusters.pluto.tv/v1/search"
 URL_CATEGORIES = "https://service-vod.clusters.pluto.tv/v4/vod/categories"
 URL_CATEGORY_ITEMS = "https://service-vod.clusters.pluto.tv/v4/vod/categories/{category_id}/items"
-URL_SERIES_SEASONS = "https://service-vod.clusters.pluto.tv/v3/vod/series/{content_id}/seasons"
+URL_SERIES_SEASONS = "https://service-vod.clusters.pluto.tv/v4/vod/series/{content_id}/seasons"
 URL_EPISODES = "https://service-vod.clusters.pluto.tv/v4/vod/episodes/{content_id}"
 URL_ON_DEMAND = "https://pluto.tv/on-demand"
 URL_STREAM_STITCHER = "https://cfd-v4-service-stitcher-dash-use1-1.prd.pluto.tv"
 URL_DRM_LICENSE = "https://service-concierge.clusters.pluto.tv/v1/wv/alt?jwt={token}"
 
 HEADERS_BASE = {
-    "User-Agent": "Mozilla/5.0",
-    "Accept": "application/json",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "Accept": "*/*",
     "Origin": "https://pluto.tv",
     "Referer": "https://pluto.tv/",
 }
 
 IST_HEADERS = (
-    "User-Agent=Mozilla/5.0"
+    "User-Agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
     "&Origin=https://pluto.tv"
     "&Referer=https://pluto.tv/"
 )
