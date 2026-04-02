@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <category label="32000">
+        <setting id="ads_skipper" 
+                 type="bool"
+                 label="32001"
+                 default="true"/>
+    </category>
+</settings>

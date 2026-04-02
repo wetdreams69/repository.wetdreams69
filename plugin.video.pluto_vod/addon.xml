@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.pluto_vod" name="Pluto VOD" version="0.0.3" provider-name="wetdreams69">
+<addon id="plugin.video.pluto_vod" name="Pluto VOD" version="1.0.2" provider-name="wetdreams69">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="inputstream.adaptive" optional="true"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="main.py">
         <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="es">Streaming de películas y series desde Pluto TV</summary>
+        <description lang="es">Addon no oficial para ver contenido desde Pluto TV con soporte para DRM Widevine</description>
+        <platform>all</platform>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+        <language>resources/language</language>
+        <license>MIT</license>
+        <source>https://github.com/wetdreams69/plugin.video.pluto_vod</source>
     </extension>
 </addon>
