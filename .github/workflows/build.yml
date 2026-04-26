@@ -36,6 +36,7 @@ jobs:
           curl -L -o zips/plugin.video.mercadoplay.zip https://github.com/wetdreams69/plugin.video.mercadoplay/raw/master/plugin.video.mercadoplay.zip
           curl -L -o zips/plugin.video.youtubemovieslatino.zip https://github.com/wetdreams69/plugin.video.youtubemovieslatino/raw/main/plugin.video.youtubemovieslatino.zip
           curl -L -o zips/plugin.video.pluto_vod.zip https://github.com/wetdreams69/plugin.video.pluto_vod/raw/master/plugin.video.pluto_vod.zip
+          curl -L -o zips/script.module.cacheman.zip https://github.com/wetdreams69/script.module.cacheman/raw/master/script.module.cacheman.zip
 
       - name: Unzip addons and build structure
         run: |
