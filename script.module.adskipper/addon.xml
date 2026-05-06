@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon
+    id="script.module.adskipper"
+    version="2.0.0"
+    name="AdSkipper"
+    provider-name="wetdreams69">
+
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+
+    <extension point="xbmc.python.module" library="lib"/>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">MPEG-DASH ad skipping library for Kodi addons</summary>
+        <description lang="en_GB">
+            Provides MPD manifest parsing and automatic ad-period skipping
+            for Kodi addons that play MPEG-DASH streams (e.g. Pluto TV).
+            Import adskipper in your addon to use it.
+        </description>
+        <platform>all</platform>
+    </extension>
+
+</addon>
