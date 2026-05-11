@@ -77,7 +77,7 @@ jobs:
           done
           
           # Repositorio ZIP para el RELEASE
-          cp "repo/repository.wetdreams69/repository.wetdreams69-1.0.0.zip" "repository.zip"
+          cp "repo/repository.wetdreams69/repository.wetdreams69-1.0.2.zip" "repository.zip"
           
           echo "=== Repository contents ==="
           ls -R repo/
