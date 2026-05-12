@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.pluto_vod" name="Pluto VOD" version="1.0.4" provider-name="wetdreams69">
+<addon id="plugin.video.pluto_vod" name="Pluto VOD" version="1.0.5" provider-name="wetdreams69">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="inputstream.adaptive" optional="true"/>
+        <import addon="script.module.adskipper"/>
+        <import addon="script.module.cacheman"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="main.py">
         <provides>video</provides>

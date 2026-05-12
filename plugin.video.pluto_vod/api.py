@@ -3,9 +3,9 @@ import urllib.parse
 import urllib.request
 import uuid
 import xbmc
-from cache_manager import CacheManager
+from cacheman import CacheManager
 
-cache_manager = CacheManager()
+cache_manager = CacheManager(db_name='pluto_vod.db')
 
 from constants import (
     HEADERS_BASE,
@@ -23,7 +23,8 @@ def build_url(url, params=None):
 
 def http_get(url, headers=None, params=None, cache_name=None):
     if cache_name:
-        cached_data = cache_manager.get(cache_name, url, params)
+        key = f"{cache_name}:{url}:{json.dumps(params or {}, sort_keys=True)}"
+        cached_data = cache_manager.get(key)
         if cached_data:
             xbmc.log(f"{LOG_PREFIX_PLUTO} Usando caché para: {cache_name}", xbmc.LOGDEBUG)
             return cached_data
@@ -34,7 +35,12 @@ def http_get(url, headers=None, params=None, cache_name=None):
     with urllib.request.urlopen(req, timeout=15) as res:
         data = json.loads(res.read().decode())
         if cache_name:
-            cache_manager.set(cache_name, data, url, params)
+            ttl = {
+                'fetch_category_data': 43200,
+                'fetch_video_details': 43200,
+                'fetch_season_episodes': 43200,
+            }.get(cache_name, 3600)
+            cache_manager.set(key, data, ttl=ttl)
         return data
 
 
@@ -52,6 +58,6 @@ def get_token():
     })
     data = http_get(URL_AUTH_START, params=params)
     token = data["sessionToken"]
-    cache_manager.set('csrf_token', token)
+    cache_manager.set('csrf_token', token, ttl=86400)
     xbmc.log(f"{LOG_PREFIX_PLUTO} Token obtenido y cacheado", xbmc.LOGINFO)
     return token

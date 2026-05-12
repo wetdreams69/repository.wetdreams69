@@ -7,8 +7,7 @@ import xbmcaddon
 import threading
 
 from api import get_token, HEADERS_BASE, http_get
-from manifest import get_periods_from_manifest, filter_ad_periods
-from ad_skipper import AdSkipper
+from adskipper import start_ad_skipper
 from constants import (
     URL_EPISODES,
     URL_STREAM_STITCHER,
@@ -63,38 +62,22 @@ def play(addon_handle, content_id, ad_skipper_data):
         base = URL_STREAM_STITCHER
         stream = f"{base}/v2{dash_path}?{urllib.parse.urlencode(params)}"
         xbmc.log(f"{LOG_PREFIX_PLUTO} Stream URL built", xbmc.LOGINFO)
-        periods = get_periods_from_manifest(stream)
-        ad_periods = filter_ad_periods(periods, AD_MIN_DURATION, AD_MAX_DURATION)
-        if ad_periods:
-            addon = xbmcaddon.Addon()
-            ads_skipper_enabled = addon.getSettingBool("ads_skipper")
-            
-            if ads_skipper_enabled:
-                xbmc.log(
-                    f"{LOG_PREFIX_PLUTO} Ads Skipper enabled! {len(ad_periods)} ads detected - starting auto-skip",
-                    xbmc.LOGINFO
-                )
-                dialog = xbmcgui.Dialog()
-                dialog.notification(
-                    "Pluto TV",
-                    f"{len(ad_periods)} ads detected - auto-skip",
-                    xbmcgui.NOTIFICATION_INFO,
-                    3000
-                )
-                skipper = AdSkipper(ad_periods)
-                skipper_thread = threading.Thread(target=skipper.start_monitoring)
-                skipper_thread.daemon = True
-                skipper_thread.start()
-                ad_skipper_data['skipper'] = skipper
-                ad_skipper_data['thread'] = skipper_thread
-                xbmc.log(
-                    f"{LOG_PREFIX_AD_SKIP} Started - will skip short ads ({AD_MIN_DURATION}-{AD_MAX_DURATION}s)",
-                    xbmc.LOGINFO
-                )
-            else:
-                xbmc.log(f"{LOG_PREFIX_PLUTO} Ads Skipper is disabled in settings.", xbmc.LOGINFO)
-        else:
-            xbmc.log(f"{LOG_PREFIX_PLUTO} No short ads found in manifest", xbmc.LOGINFO)
+
+        addon = xbmcaddon.Addon()
+        if addon.getSettingBool("ads_skipper"):
+            skipper, thread = start_ad_skipper(
+                stream_url=stream,
+                label="Pluto TV",
+                min_duration=AD_MIN_DURATION,
+                max_duration=AD_MAX_DURATION,
+                extra_headers={
+                    "Origin": "https://pluto.tv",
+                    "Referer": "https://pluto.tv/",
+                }
+            )
+            ad_skipper_data['skipper'] = skipper
+            ad_skipper_data['thread'] = thread
+        
         li = xbmcgui.ListItem(path=stream)
         li.setMimeType(MIME_TYPE_DASH)
         li.setProperty("inputstream", INPUTSTREAM_NAME)
