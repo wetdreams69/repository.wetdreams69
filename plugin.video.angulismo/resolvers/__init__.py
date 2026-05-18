@@ -6,10 +6,16 @@ from .hoca6 import resolve as resolve_hoca6
 from .nebunexa import resolve as resolve_nebunexa
 from .streamtp import resolve as resolve_streamtp
 from .pracanes import resolve as resolve_pracanes
+from .angulismo import resolve as resolve_angulismo
+from .elcanaldeportivo import resolve as resolve_elcanaldeportivo
+from .la14hd import resolve as resolve_la14hd
 
 # Registry of resolvers: (match_function, resolve_function)
 RESOLVER_REGISTRY = [
+    (lambda u: "angulismo" in u or "cvattv" in u or "gigared" in u, resolve_angulismo),
     (lambda u: "bolaloca" in u, resolve_bolaloca),
+    (lambda u: "la14hd" in u, resolve_la14hd),
+    (lambda u: "elcanaldeportivo" in u, resolve_elcanaldeportivo),
     (lambda u: "tucanaldeportivo" in u or "canales.php" in u or "ksdjugfsddeports" in u, resolve_futbollibre),
     (lambda u: "hoca6" in u or "hoca8" in u or "cdn" in u, resolve_hoca6),
     (lambda u: "nebunexa" in u or "bestleague.world" in u, resolve_nebunexa),
