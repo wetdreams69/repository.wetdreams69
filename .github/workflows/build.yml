@@ -45,7 +45,7 @@ jobs:
             "plugin.video.mercadoplay"
             "plugin.video.youtubemovieslatino"
             "plugin.video.pluto_vod"
-            "plugin.video.angulismo"
+            "plugin.video.robinhood"
             "script.module.cacheman"
             "script.module.adskipper"
           )
