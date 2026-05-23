@@ -1,28 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="plugin.video.angulismo" name="Angulismo TV" version="1.0.0" provider-name="wetdreams69">
-  <requires>
-    <import addon="xbmc.python" version="3.0.1"/>
-    <import addon="script.module.requests" version="2.31.0"/>
-    <import addon="script.module.beautifulsoup4" version="4.12.2"/>
-    <import addon="inputstream.adaptive" version="2.0.12"/>
-    <import addon="script.module.cacheman" version="1.0.0"/>
-  </requires>
-  <extension point="xbmc.python.pluginsource" library="main.py">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <summary lang="es_ES">Angulismo TV Kodi Addon</summary>
-    <description lang="es_ES">Addon para visualizar canales y eventos de Angulismo TV.</description>
-    <language>es</language>
-    <platform>all</platform>
-    <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.jpg</fanart>
-    </assets>
-  </extension>
-</addon>
-
 <addon id="plugin.video.mercadoplay"
        name="MercadoLibre Play"
        version="1.4.0"
@@ -75,36 +52,6 @@
         <source>https://github.com/wetdreams69/plugin.video.pluto_vod</source>
     </extension>
 </addon>
-
-<addon id="plugin.video.youtubemovieslatino"
-       name="YouTube Movies Latino"
-       version="1.0.0"
-       provider-name="wetdreams69">
-
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.requests" version="2.18.4"/>
-        <import addon="plugin.video.youtube" version="7.0.1"/>
-    </requires>
-
-    <extension point="xbmc.python.pluginsource" library="addon.py">
-        <provides>video</provides>
-    </extension>
-
-    <extension point="xbmc.addon.metadata">
-        <summary lang="es">Muestra películas de YouTube</summary>
-        <description lang="es">Este addon lista películas de YouTube.</description>
-        <platform>all</platform>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-        <license>MIT</license>
-        <language>es</language>
-        <website>https://github.com/wetdreams69/plugin.video.youtubemovieslatino</website>
-    </extension>
-
-</addon>
-
 
 <addon id="repository.wetdreams69" name="wetdreams69 Repository" version="1.0.3" provider-name="wetdreams69">
     <extension point="xbmc.addon.repository" name="wetdreams69 Repository">
