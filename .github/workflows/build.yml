@@ -26,61 +26,54 @@ jobs:
         run: |
           mkdir -p repo
           mkdir -p zips
+          mkdir -p zips_download
 
       - name: Package repository addon
         run: |
+          repo_version=$(python3 -c "import xml.etree.ElementTree as ET; print(ET.parse('repository.wetdreams69/addon.xml').getroot().attrib['version'])")
+          mkdir -p repo/repository.wetdreams69
+          cp repository.wetdreams69/addon.xml repo/repository.wetdreams69/addon.xml
+          zip -qr "repo/repository.wetdreams69/repository.wetdreams69-${repo_version}.zip" repository.wetdreams69
           zip -qr zips/repository.wetdreams69.zip repository.wetdreams69
+          cp "repo/repository.wetdreams69/repository.wetdreams69-${repo_version}.zip" repository.zip
 
-      - name: Download addon zips
+      - name: Download all addon releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl -L -o zips/plugin.video.mercadoplay.zip https://github.com/wetdreams69/plugin.video.mercadoplay/raw/master/plugin.video.mercadoplay.zip
-          curl -L -o zips/plugin.video.youtubemovieslatino.zip https://github.com/wetdreams69/plugin.video.youtubemovieslatino/raw/main/plugin.video.youtubemovieslatino.zip
-          curl -L -o zips/plugin.video.pluto_vod.zip https://github.com/wetdreams69/plugin.video.pluto_vod/raw/master/plugin.video.pluto_vod.zip
-          curl -L -o zips/plugin.video.angulismo.zip https://github.com/wetdreams69/plugin.video.angulismo/raw/master/plugin.video.angulismo.zip
-          curl -L -o zips/script.module.cacheman.zip https://github.com/wetdreams69/script.module.cacheman/raw/master/script.module.cacheman.zip
-          curl -L -o zips/script.module.adskipper.zip https://github.com/wetdreams69/script.module.adskipper/raw/master/script.module.adskipper.zip
-
-      - name: Unzip addons and build structure
-        run: |
-          for zip in zips/*.zip; do
-            unzip -q -o "$zip" -d repo/
+          repos=(
+            "plugin.video.mercadoplay"
+            "plugin.video.youtubemovieslatino"
+            "plugin.video.pluto_vod"
+            "plugin.video.angulismo"
+            "script.module.cacheman"
+            "script.module.adskipper"
+          )
+          for repo in "${repos[@]}"; do
+            gh api repos/wetdreams69/$repo/releases \
+              --jq '.[] | .assets[] | select(.name | endswith(".zip")) | [.name, .browser_download_url] | @tsv' |
+            while IFS=$'\t' read -r asset_name asset_url; do
+              if [ ! -f "zips_download/$asset_name" ]; then
+                curl -L "$asset_url" -o "zips_download/$asset_name"
+              fi
+            done
           done
+
+      - name: Process downloaded addon zips
+        run: |
+          python3 process_zips.py
+          rm -rf zips_download
 
       - name: Generate addons.xml and md5
         run: |
           echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > repo/addons.xml
           echo "<addons>" >> repo/addons.xml
           find repo -name addon.xml | sort | while read addon; do
-            # Extract content minus the first line (<?xml...)
             sed '1d' "$addon" >> repo/addons.xml
             echo "" >> repo/addons.xml
           done
           echo "</addons>" >> repo/addons.xml
           md5sum repo/addons.xml | cut -d ' ' -f1 > repo/addons.xml.md5
-
-      - name: Organize zip files according to Kodi specifications
-        run: |
-          for addon_xml in repo/*/addon.xml; do
-            addon_dir=$(dirname "$addon_xml")
-            addon_id=$(python3 -c "import xml.etree.ElementTree as ET; print(ET.parse('$addon_xml').getroot().attrib['id'])")
-            addon_version=$(python3 -c "import xml.etree.ElementTree as ET; print(ET.parse('$addon_xml').getroot().attrib['version'])")
-            
-            if [ -n "$addon_id" ] && [ -n "$addon_version" ]; then
-              if [ -f "zips/$addon_id.zip" ]; then
-                cp "zips/$addon_id.zip" "repo/$addon_id/${addon_id}-${addon_version}.zip"
-              else
-                cd repo
-                zip -qr "$addon_id/${addon_id}-${addon_version}.zip" "$addon_id"
-                cd ..
-              fi
-            fi
-          done
-          
-          # Repositorio ZIP para el RELEASE
-          cp "repo/repository.wetdreams69/repository.wetdreams69-1.0.3.zip" "repository.zip"
-          
-          echo "=== Repository contents ==="
-          ls -R repo/
 
       - name: Generate Directory Index (Github Pages Apache mimic)
         run: |
